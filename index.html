@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Bite Treatment Center - ABTC Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <style>
+        .sidebar-collapsed {
+            width: 4rem;
+        }
+        .sidebar-expanded {
+            width: 16rem;
+        }
+        .main-content-collapsed {
+            margin-left: 4rem;
+        }
+        .main-content-expanded {
+            margin-left: 16rem;
+        }
+        .footer-collapsed {
+            margin-left: 4rem;
+        }
+        .footer-expanded {
+            margin-left: 16rem;
+        }
+        .header-height {
+            height: 80px;
+        }
+        .sidebar-top {
+            top: 80px;
+        }
+        .main-padding-top {
+            padding-top: 100px;
+        }
+        /* Activity log animations */
+        .activity-item {
+            animation: slideInLeft 0.3s ease-out;
+        }
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        /* Hover effects for better feedback */
+        .hover-scale {
+            transition: transform 0.2s ease-in-out;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        /* Loading skeleton for better perceived performance */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        /* Focus states for accessibility */
+        .focus-visible:focus {
+            outline: 2px solid #3B82F6;
+            outline-offset: 2px;
+        }
+        /* Micro-interactions */
+        .button-press {
+            transition: all 0.1s ease-in-out;
+        }
+        .button-press:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b-4 border-blue-600 fixed top-0 left-0 right-0 z-50 header-height">
+        <div class="flex items-center justify-between px-6 py-4 h-full">
+            <div class="flex items-center space-x-4">
+                <button id="sidebarToggle" class="text-gray-600 hover:text-blue-600 transition-colors focus-visible">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-600 p-2 rounded-lg">
+                        <i class="fas fa-hospital text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">ABTC MOPH</h1>
+                        <p class="text-sm text-gray-600">Animal Bite Treatment Center</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg">
+                    <i class="fas fa-calendar text-gray-600"></i>
+                    <span class="text-sm text-gray-700" id="currentDate">July 28, 2025</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-green-100 px-3 py-2 rounded-lg">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm text-green-700">System Online</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <button class="text-gray-600 hover:text-blue-600 cursor-pointer focus-visible" id="notificationBtn" aria-label="View notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <div class="hidden md:block">
+                            <p class="text-sm font-medium text-gray-800">Dr. Berma</p>
+                            <p class="text-xs text-gray-600">Administrator</p>
+                        </div>
+                        <button class="text-gray-600 text-sm cursor-pointer focus-visible" aria-label="User menu">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar-expanded bg-gray-900 text-white fixed left-0 sidebar-top bottom-0 z-40 transition-all duration-300 overflow-hidden">
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-blue-600 text-white focus-visible">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="patientrecordView.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-bed w-5"></i>
+                        <span class="sidebar-text">Patient Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-dog w-5"></i>
+                        <span class="sidebar-text">ABTC Registry</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-user-md w-5"></i>
+                        <span class="sidebar-text">Staff Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-flask w-5"></i>
+                        <span class="sidebar-text">Vaccine Inventory</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-cog w-5"></i>
+                        <span class="sidebar-text">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- User Info at Bottom -->
+        <div class="absolute bottom-4 left-4 right-4">
+            <div class="bg-gray-800 rounded-lg p-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-hospital text-white text-sm"></i>
+                    </div>
+                    <div class="sidebar-text">
+                        <p class="text-xs font-medium">MOPH</p>
+                        <p class="text-xs text-gray-400">License: DOH-2025-001</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="main-content-expanded transition-all duration-300 main-padding-top pb-16 min-h-screen">
+        <div class="container mx-auto px-6 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6" aria-label="Breadcrumb">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span class="text-blue-600 font-medium">Overview</span>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6 border-l-4 border-blue-600 hover-scale">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-tachometer-alt text-blue-600 mr-3"></i>
+                            Dashboard Overview
+                        </h1>
+                        <p class="text-gray-600 mt-2">Real-time monitoring of Animal Bite Treatment Center operations</p>
+                    </div>
+                    <div class="text-left lg:text-right">
+                        <div class="flex flex-wrap gap-2">
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center button-press focus-visible">
+                                <i class="fas fa-download mr-2"></i>
+                                Export Report
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Last Updated: <span class="font-semibold" id="lastUpdated">July 28, 2025 - 10:30 AM</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards with Micro-interactions -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-6 shadow-lg hover-scale cursor-pointer" role="button" tabindex="0">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold">Active Cases</h3>
+                            <p class="text-3xl font-bold">8</p>
+                            <p class="text-sm opacity-80">Currently under treatment</p>
+                            <div class="mt-2 flex items-center">
+                                <i class="fas fa-arrow-up text-green-300 text-sm mr-1"></i>
+                                <span class="text-sm">+2 this week</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-heartbeat text-3xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-6 shadow-lg hover-scale cursor-pointer" role="button" tabindex="0">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold">Completed</h3>
+                            <p class="text-3xl font-bold">24</p>
+                            <p class="text-sm opacity-80">Treatment completed</p>
+                            <div class="mt-2 flex items-center">
+                                <i class="fas fa-arrow-up text-green-300 text-sm mr-1"></i>
+                                <span class="text-sm">+4 this month</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-check-circle text-3xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg p-6 shadow-lg hover-scale cursor-pointer" role="button" tabindex="0">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold">High Priority</h3>
+                            <p class="text-3xl font-bold">3</p>
+                            <p class="text-sm opacity-80">Category III cases</p>
+                            <div class="mt-2 flex items-center">
+                                <i class="fas fa-exclamation-triangle text-orange-300 text-sm mr-1"></i>
+                                <span class="text-sm">Requires attention</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-exclamation-triangle text-3xl opacity-80"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg p-6 shadow-lg hover-scale cursor-pointer" role="button" tabindex="0">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold">Vaccine Stock</h3>
+                            <p class="text-3xl font-bold">89%</p>
+                            <p class="text-sm opacity-80">Current availability</p>
+                            <div class="mt-2 flex items-center">
+                                <i class="fas fa-check text-green-300 text-sm mr-1"></i>
+                                <span class="text-sm">Well stocked</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-flask text-3xl opacity-80"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <!-- Recent Patients Section -->
+                <div class="lg:col-span-2 bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                                <i class="fas fa-users text-blue-600 mr-2"></i>
+                                Recent Patients
+                            </h2>
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium focus-visible">
+                                View All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="divide-y divide-gray-200">
+                        <div class="p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-pink-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Maria Santos</p>
+                                        <p class="text-sm text-gray-500">Dog bite - Right Hand</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Category II</span>
+                                    <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Juan Dela Cruz</p>
+                                        <p class="text-sm text-gray-500">Dog bite - Left Leg</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Category III</span>
+                                    <p class="text-xs text-gray-500 mt-1">5 hours ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">Ana Rodriguez</p>
+                                        <p class="text-sm text-gray-500">Cat scratch - Arm</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Category I</span>
+                                    <p class="text-xs text-gray-500 mt-1">1 day ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Log Section -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                                <i class="fas fa-history text-blue-600 mr-2"></i>
+                                Activity Log
+                            </h2>
+                            <button class="text-gray-400 hover:text-gray-600 focus-visible" id="refreshActivity" aria-label="Refresh activity log">
+                                <i class="fas fa-sync-alt text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="max-h-96 overflow-y-auto" id="activityLog">
+                        <div class="p-4 space-y-4">
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-user-plus text-blue-600 text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-gray-900">New patient registered</p>
+                                        <p class="text-xs text-gray-500">Maria Santos - Category II bite</p>
+                                        <p class="text-xs text-gray-400">2 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-syringe text-green-600 text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-gray-900">Vaccine administered</p>
+                                        <p class="text-xs text-gray-500">Juan Dela Cruz - Dose 2/4</p>
+                                        <p class="text-xs text-gray-400">3 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-exclamation-triangle text-yellow-600 text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-gray-900">Stock alert</p>
+                                        <p class="text-xs text-gray-500">Rabies vaccine below 20 units</p>
+                                        <p class="text-xs text-gray-400">4 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-file-alt text-purple-600 text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-gray-900">Report generated</p>
+                                        <p class="text-xs text-gray-500">Weekly ABTC summary</p>
+                                        <p class="text-xs text-gray-400">6 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-check text-green-600 text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-gray-900">Treatment completed</p>
+                                        <p class="text-xs text-gray-500">Carlos Mendoza - 14-day series</p>
+                                        <p class="text-xs text-gray-400">1 day ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-bolt text-blue-600 mr-2"></i>
+                    Quick Actions
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors button-press focus-visible">
+                        <i class="fas fa-user-plus text-blue-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-800">New Patient</span>
+                    </button>
+                    <button class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors button-press focus-visible">
+                        <i class="fas fa-syringe text-green-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-800">Record Vaccine</span>
+                    </button>
+                    <button class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors button-press focus-visible">
+                        <i class="fas fa-calendar-check text-purple-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-800">Schedule Follow-up</span>
+                    </button>
+                    <button class="flex flex-col items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors button-press focus-visible">
+                        <i class="fas fa-chart-bar text-yellow-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-800">View Reports</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Legend with Enhanced Visual Hierarchy -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                    WHO Rabies Exposure Category Classification
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">Category I</span>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Licking, nibbling</p>
+                            <p class="text-xs text-gray-600">Intact skin contact with saliva</p>
+                            <p class="text-xs text-green-700 mt-1">• No post-exposure prophylaxis required</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">Category II</span>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Minor scratches</p>
+                            <p class="text-xs text-gray-600">Abrasions without bleeding</p>
+                            <p class="text-xs text-yellow-700 mt-1">• Wound treatment + vaccination</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-3 bg-red-50 rounded-lg">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-800">Category III</span>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Transdermal bites</p>
+                            <p class="text-xs text-gray-600">Single/multiple bites with bleeding</p>
+                            <p class="text-xs text-red-700 mt-1">• Wound treatment + vaccination + immunoglobulin</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-gray-900 text-white py-8 footer-expanded transition-all duration-300">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="bg-blue-600 p-2 rounded-lg">
+                            <i class="fas fa-hospital text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">MOPH</h3>
+                            <p class="text-sm text-gray-400">Excellence in Healthcare</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-400">
+                        Providing quality healthcare services since 1985. 
+                        DOH Licensed and Accredited Medical Institution.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Information</h4>
+                    <div class="space-y-2 text-sm text-gray-400">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-map-marker-alt w-4"></i>
+                            <span>Balingasag Provincial Hospital, Balingasag Misamis Oriental</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-phone w-4"></i>
+                            <span>(02) 8123-4567</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-envelope w-4"></i>
+                            <span>info@MOPHABTCBALINGASAG.ph</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-clock w-4"></i>
+                            <span>24/7 Emergency Services</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Patient Portal</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Emergency Services</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Laboratory Results</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Appointment Booking</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Insurance Partners</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Certifications</h4>
+                    <div class="space-y-2 text-sm text-gray-400">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-certificate text-blue-400 w-4"></i>
+                            <span>DOH License: DOH-2025-HOSP-001</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-award text-green-400 w-4"></i>
+                            <span>PhilHealth Accredited</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-shield-alt text-yellow-400 w-4"></i>
+                            <span>ISO 9001:2015 Certified</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-dog text-purple-400 w-4"></i>
+                            <span>ABTC Accredited Center</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="text-sm text-gray-400">
+                        <p>&copy; 2025 MOPH. All rights reserved.</p>
+                        <p class="mt-1">Hospital Management System v2.4.1 | Last Updated: July 28, 2025</p>
+                    </div>
+                    <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                        <span class="text-sm text-gray-400">Follow us:</span>
+                        <div class="flex space-x-3">
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors focus-visible" aria-label="Facebook">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors focus-visible" aria-label="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors focus-visible" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors focus-visible" aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const footer = document.getElementById('footer');
+        
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-collapsed');
+            sidebar.classList.toggle('sidebar-expanded');
+            mainContent.classList.toggle('main-content-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            footer.classList.toggle('footer-collapsed');
+            footer.classList.toggle('footer-expanded');
+            
+            // Hide/show sidebar text with animation
+            const sidebarTexts = document.querySelectorAll('.sidebar-text');
+            sidebarTexts.forEach(text => {
+                if (sidebar.classList.contains('sidebar-collapsed')) {
+                    text.style.opacity = '0';
+                    setTimeout(() => {
+                        text.style.display = 'none';
+                    }, 150);
+                } else {
+                    text.style.display = 'inline';
+                    setTimeout(() => {
+                        text.style.opacity = '1';
+                    }, 150);
+                }
+            });
+        });
+
+        // Activity log refresh functionality
+        document.getElementById('refreshActivity').addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            icon.style.animation = 'spin 1s linear';
+            
+            // Simulate loading new activities
+            setTimeout(() => {
+                icon.style.animation = '';
+                // Add visual feedback
+                const activityLog = document.getElementById('activityLog');
+                activityLog.style.opacity = '0.7';
+                setTimeout(() => {
+                    activityLog.style.opacity = '1';
+                }, 500);
+            }, 1000);
+        });
+
+        // Notification functionality with better UX
+        document.getElementById('notificationBtn').addEventListener('click', function() {
+            // Create a more sophisticated notification panel
+            const notifications = [
+                { type: 'info', message: 'New patient Maria Santos registered', time: '2 hours ago' },
+                { type: 'warning', message: 'Vaccine stock running low', time: '4 hours ago' },
+                { type: 'success', message: 'Weekly report generated successfully', time: '6 hours ago' }
+            ];
+            
+            let notificationHtml = 'Recent Notifications:\n\n';
+            notifications.forEach(notif => {
+                notificationHtml += `• ${notif.message} (${notif.time})\n`;
+            });
+            
+            alert(notificationHtml);
+            
+            // Remove notification badge after viewing
+            const badge = this.querySelector('span');
+            badge.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }, 300);
+        });
+
+        // Real-time updates simulation
+        function updateDashboard() {
+            const lastUpdated = document.getElementById('lastUpdated');
+            const now = new Date();
+            const timeString = now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            lastUpdated.textContent = timeString;
+        }
+
+        // Auto-refresh functionality
+        setInterval(updateDashboard, 30000); // Update every 30 seconds
+
+        // Enhanced interactivity for stat cards
+        document.querySelectorAll('[role="button"]').forEach(card => {
+            card.addEventListener('click', function() {
+                const cardType = this.querySelector('h3').textContent;
+                console.log(`Clicked on ${cardType} card`);
+                // Add visual feedback
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 100);
+                }, 100);
+            });
+            
+            // Keyboard navigation support
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+
+        // Quick actions functionality
+        document.querySelectorAll('.grid button').forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.querySelector('span').textContent;
+                console.log(`Quick action: ${action}`);
+                
+                // Provide immediate feedback
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+                
+                // Simulate action execution
+                const originalText = this.querySelector('span').textContent;
+                this.querySelector('span').textContent = 'Processing...';
+                setTimeout(() => {
+                    this.querySelector('span').textContent = originalText;
+                }, 1500);
+            });
+        });
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date
+            const currentDate = document.getElementById('currentDate');
+            const today = new Date();
+            currentDate.textContent = today.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Add loading states for better perceived performance
+            setTimeout(() => {
+                document.querySelectorAll('.skeleton').forEach(el => {
+                    el.classList.remove('skeleton');
+                });
+            }, 1000);
+            
+            // Initialize tooltips and accessibility features
+            document.querySelectorAll('[title]').forEach(element => {
+                element.setAttribute('aria-label', element.getAttribute('title'));
+            });
+        });
+
+        // Add CSS animation for spinning
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
