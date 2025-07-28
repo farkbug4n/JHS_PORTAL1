@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Record - Animal Bite Treatment Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <style>
+        .sidebar-collapsed {
+            width: 4rem;
+        }
+        .sidebar-expanded {
+            width: 16rem;
+        }
+        .main-content-collapsed {
+            margin-left: 4rem;
+        }
+        .main-content-expanded {
+            margin-left: 16rem;
+        }
+        .footer-collapsed {
+            margin-left: 4rem;
+        }
+        .footer-expanded {
+            margin-left: 16rem;
+        }
+        .header-height {
+            height: 80px;
+        }
+        .sidebar-top {
+            top: 80px;
+        }
+        .main-padding-top {
+            padding-top: 100px;
+        }
+        /* Activity log animations */
+        .activity-item {
+            animation: slideInLeft 0.3s ease-out;
+        }
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        /* Hover effects for better feedback */
+        .hover-scale {
+            transition: transform 0.2s ease-in-out;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        /* Loading skeleton for better perceived performance */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        /* Focus states for accessibility */
+        .focus-visible:focus {
+            outline: 2px solid #3B82F6;
+            outline-offset: 2px;
+        }
+        /* Micro-interactions */
+        .button-press {
+            transition: all 0.1s ease-in-out;
+        }
+        .button-press:active {
+            transform: scale(0.98);
+        }
+
+        /* Patient Record Specific Styles */
+        .gradient-bg {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.4);
+        }
+        .record-section {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            padding: 2rem;
+        }
+        .record-group {
+            margin-bottom: 1.5rem;
+        }
+        .record-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .record-value {
+            display: block;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: #1f2937;
+            min-height: 44px;
+        }
+        .record-value.empty {
+            color: #9ca3af;
+            font-style: italic;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .status-complete { background: #dcfce7; color: #166534; }
+        .status-incomplete { background: #fef3c7; color: #92400e; }
+        .status-pending { background: #dbeafe; color: #1e40af; }
+        .category-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+        .category-1 { background: #dcfce7; color: #166534; }
+        .category-2 { background: #fef3c7; color: #92400e; }
+        .category-3 { background: #fee2e2; color: #991b1b; }
+        .vaccine-schedule-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .vaccine-schedule-table th,
+        .vaccine-schedule-table td {
+            border: 1px solid #d1d5db;
+            padding: 12px;
+            text-align: left;
+        }
+        .vaccine-schedule-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+        .vaccine-given {
+            color: #059669;
+            font-weight: 600;
+        }
+        .vaccine-not-given {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        .success-message {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .patient-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b-4 border-blue-600 fixed top-0 left-0 right-0 z-50 header-height">
+        <div class="flex items-center justify-between px-6 py-4 h-full">
+            <div class="flex items-center space-x-4">
+                <button id="sidebarToggle" class="text-gray-600 hover:text-blue-600 transition-colors focus-visible">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-600 p-2 rounded-lg">
+                        <i class="fas fa-hospital text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">ABTC MOPH</h1>
+                        <p class="text-sm text-gray-600">Animal Bite Treatment Center</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg">
+                    <i class="fas fa-calendar text-gray-600"></i>
+                    <span class="text-sm text-gray-700" id="currentDate">July 28, 2025</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-green-100 px-3 py-2 rounded-lg">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm text-green-700">System Online</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <button class="text-gray-600 hover:text-blue-600 cursor-pointer focus-visible" id="notificationBtn" aria-label="View notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <div class="hidden md:block">
+                            <p class="text-sm font-medium text-gray-800">Dr. Berma</p>
+                            <p class="text-xs text-gray-600">Administrator</p>
+                        </div>
+                        <button class="text-gray-600 text-sm cursor-pointer focus-visible" aria-label="User menu">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar-expanded bg-gray-900 text-white fixed left-0 sidebar-top bottom-0 z-40 transition-all duration-300 overflow-hidden">
+        <nav class="p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="dashboard1.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-blue-600 text-white focus-visible">
+                        <i class="fas fa-bed w-5"></i>
+                        <span class="sidebar-text">Patient Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-dog w-5"></i>
+                        <span class="sidebar-text">ABTC Registry</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-user-md w-5"></i>
+                        <span class="sidebar-text">Staff Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-flask w-5"></i>
+                        <span class="sidebar-text">Vaccine Inventory</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-chart-bar w-5"></i>
+                        <span class="sidebar-text">Reports</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors focus-visible">
+                        <i class="fas fa-cog w-5"></i>
+                        <span class="sidebar-text">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <!-- User Info at Bottom -->
+        <div class="absolute bottom-4 left-4 right-4">
+            <div class="bg-gray-800 rounded-lg p-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-hospital text-white text-sm"></i>
+                    </div>
+                    <div class="sidebar-text">
+                        <p class="text-xs font-medium">MOPH</p>
+                        <p class="text-xs text-gray-400">License: DOH-2025-001</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="main-content-expanded transition-all duration-300 main-padding-top pb-16 min-h-screen">
+        <div class="container mx-auto px-6 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6" aria-label="Breadcrumb">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span>Patient Management</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span class="text-blue-600 font-medium">Patient Record</span>
+            </nav>
+
+            <!-- Success Message -->
+            <div id="success-message" class="success-message hidden">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span id="success-text">Action completed successfully!</span>
+                </div>
+            </div>
+
+            <!-- Patient Header Summary -->
+            <div class="patient-header hover-scale">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-2" id="patient-name-header">Maria Santos Cruz</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div>
+                                <span class="text-blue-200">Patient No:</span>
+                                <div class="font-semibold" id="patient-no-header">PT-20250726-001</div>
+                            </div>
+                            <div>
+                                <span class="text-blue-200">Age/Sex:</span>
+                                <div class="font-semibold" id="age-sex-header">32 / Female</div>
+                            </div>
+                            <div>
+                                <span class="text-blue-200">Exposure Date:</span>
+                                <div class="font-semibold" id="exposure-date-header">July 20, 2025</div>
+                            </div>
+                            <div>
+                                <span class="text-blue-200">Status:</span>
+                                <div><span class="status-badge status-complete" id="treatment-status-header">Complete</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-blue-200 text-sm">Category</div>
+                        <span class="category-badge category-2" id="category-header">Category II</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Information Section -->
+            <div class="record-section card-hover">
+                <h2 class="section-title">
+                    <svg class="w-6 h-6 inline mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                    </svg>
+                    Patient Information
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Patient Number</label>
+                        <div class="record-value" id="patient-no">PT-20250726-001</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Registration Date</label>
+                        <div class="record-value" id="registration-date">July 26, 2025</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Health Facility</label>
+                        <div class="record-value" id="health-facility">MOPH Balingasag</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Patient Name</label>
+                        <div class="record-value" id="patient-name">Maria Santos Cruz</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Complete Address</label>
+                        <div class="record-value" id="patient-address">123 Rizal Street, Barangay San Lorenzo, Balingasag, Misamis Oriental</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Age</label>
+                        <div class="record-value" id="patient-age">32</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Sex</label>
+                        <div class="record-value" id="patient-sex">Female</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Contact Number</label>
+                        <div class="record-value" id="contact-number">+63 917 123 4567</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Occupation</label>
+                        <div class="record-value" id="occupation">Office Worker</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exposure Information Section -->
+            <div class="record-section card-hover">
+                <h2 class="section-title">
+                    <svg class="w-6 h-6 inline mr-2 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"></path>
+                    </svg>
+                    Exposure Information
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Date of Exposure</label>
+                        <div class="record-value" id="exposure-date">July 20, 2025</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Time of Exposure</label>
+                        <div class="record-value" id="exposure-time">2:30 PM</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Place of Exposure</label>
+                        <div class="record-value" id="exposure-place">Near Municipal Plaza, Balingasag</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Type of Animal</label>
+                        <div class="record-value" id="animal-type">Dog</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Type of Exposure</label>
+                        <div class="record-value" id="exposure-type">Bite</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Site of Exposure</label>
+                        <div class="record-value" id="exposure-site">Right hand, index finger</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Category of Exposure</label>
+                        <div class="record-value">
+                            Category II 
+                            <span class="category-badge category-2">Category II</span>
+                            <div class="text-xs text-gray-600 mt-1">Nibbling of uncovered skin, minor scratches without bleeding, licks on broken skin. Vaccine required.</div>
+                        </div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Provoked/Unprovoked</label>
+                        <div class="record-value" id="provocation">Unprovoked</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Animal Information Section -->
+            <div class="record-section card-hover">
+                <h2 class="section-title">
+                    <svg class="w-6 h-6 inline mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                    </svg>
+                    Animal Information
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Animal Status at time of exposure</label>
+                        <div class="record-value" id="animal-status">Alive</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Animal Ownership</label>
+                        <div class="record-value" id="animal-ownership">Stray</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Animal Vaccination History</label>
+                        <div class="record-value" id="animal-vaccination">Unknown</div>
+                    </div>
+                </div>
+
+                <div class="record-group">
+                    <label class="record-label">Animal Owner Information</label>
+                    <div class="record-value empty" id="animal-owner-info">No owner information available (stray animal)</div>
+                </div>
+            </div>
+
+            <!-- Treatment Information Section -->
+            <div class="record-section card-hover">
+                <h2 class="section-title">
+                    <svg class="w-6 h-6 inline mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Treatment Information
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Washing of bite wound</label>
+                        <div class="record-value" id="washing-bite">Yes</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">RIG (Rabies Immunoglobulin) Given</label>
+                        <div class="record-value" id="rig-given">No (Category II - not required)</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Route of Vaccine Administration</label>
+                        <div class="record-value" id="vaccine-route">Intramuscular (IM)</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Vaccine Brand</label>
+                        <div class="record-value" id="vaccine-brand">Verorab</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Batch/Lot Number</label>
+                        <div class="record-value" id="vaccine-batch">VRB-2025-07-156</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vaccination Schedule Section -->
+            <div class="record-section card-hover">
+                <h2 class="section-title">
+                    <svg class="w-6 h-6 inline mr-2 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                    </svg>
+                    Vaccination Schedule
+                </h2>
+
+                <div class="overflow-x-auto">
+                    <table class="vaccine-schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Date</th>
+                                <th>Vaccine Status</th>
+                                <th>Healthcare Provider</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Day 0</strong></td>
+                                <td>July 26, 2025</td>
+                                <td><span class="vaccine-given">✓ Given</span></td>
+                                <td>Dr. Juan Dela Cruz</td>
+                                <td>Initial dose administered</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Day 3</strong></td>
+                                <td>July 29, 2025</td>
+                                <td><span class="vaccine-given">✓ Given</span></td>
+                                <td>Dr. Maria Rodriguez</td>
+                                <td>Second dose completed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Day 7</strong></td>
+                                <td>August 2, 2025</td>
+                                <td><span class="vaccine-given">✓ Given</span></td>
+                                <td>Dr. Juan Dela Cruz</td>
+                                <td>Third dose completed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Day 14</strong></td>
+                                <td>August 9, 2025</td>
+                                <td><span class="vaccine-given">✓ Given</span></td>
+                                <td>Dr. Ana Santos</td>
+                                <td>Fourth dose completed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Day 28</strong></td>
+                                <td>August 23, 2025</td>
+                                <td><span class="vaccine-given">✓ Given</span></td>
+                                <td>Dr. Juan Dela Cruz</td>
+                                <td>Final dose - treatment complete</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Follow-up and Outcome Section -->
+            <div class="record-section card-hover">
+                <h2 class="section-title">
+                    <svg class="w-6 h-6 inline mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3z" clip-rule="evenodd"></path>
+                    </svg>
+                    Follow-up and Outcome
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Treatment Outcome</label>
+                        <div class="record-value">
+                            Complete
+                            <span class="status-badge status-complete ml-2">Complete</span>
+                        </div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Date of Last Visit</label>
+                        <div class="record-value" id="last-visit-date">August 23, 2025</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Animal Status (10-14 days observation)</label>
+                        <div class="record-value" id="animal-observation-status">Lost/Unknown</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Cause of death (if applicable)</label>
+                        <div class="record-value empty" id="death-cause">Not applicable</div>
+                    </div>
+                </div>
+
+                <div class="record-group">
+                    <label class="record-label">Remarks/Additional Notes</label>
+                    <div class="record-value" id="remarks">Patient completed full vaccination series without complications. Wound healed properly. No adverse reactions to vaccine noted. Animal could not be located for observation but patient received full treatment as precaution.</div>
+                </div>
+            </div>
+
+            <!-- Healthcare Provider Information -->
+            <div class="record-section card-hover">
+                <h2 class="section-title">
+                    <svg class="w-6 h-6 inline mr-2 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                    </svg>
+                    Healthcare Provider Information
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Primary Attending Physician</label>
+                        <div class="record-value" id="healthcare-provider">Dr. Juan Dela Cruz, MD</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">License Number</label>
+                        <div class="record-value" id="license-number">PRC-12345678</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="record-group">
+                        <label class="record-label">Record Completion Date</label>
+                        <div class="record-value" id="signature-date">August 23, 2025</div>
+                    </div>
+                    <div class="record-group">
+                        <label class="record-label">Contact Information</label>
+                        <div class="record-value" id="provider-contact">+63 88 555 0123 / juan.delacruz@mophbalingasag.gov.ph</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Legend -->
+            <div class="record-section card-hover">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                    WHO Rabies Exposure Category Classification
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">Category I</span>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Licking, nibbling</p>
+                            <p class="text-xs text-gray-600">Intact skin contact with saliva</p>
+                            <p class="text-xs text-green-700 mt-1">• No post-exposure prophylaxis required</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">Category II</span>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Minor scratches</p>
+                            <p class="text-xs text-gray-600">Abrasions without bleeding</p>
+                            <p class="text-xs text-yellow-700 mt-1">• Wound treatment + vaccination</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3 p-3 bg-red-50 rounded-lg">
+                        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-800">Category III</span>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Transdermal bites</p>
+                            <p class="text-xs text-gray-600">Single/multiple bites with bleeding</p>
+                            <p class="text-xs text-red-700 mt-1">• Wound treatment + vaccination + immunoglobulin</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Record Actions -->
+            <div class="record-section card-hover">
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <button onclick="editRecord()" class="btn-secondary text-white py-3 px-8 rounded-lg font-bold shadow-lg button-press">
+                        <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                        </svg>
+                        Edit Record
+                    </button>
+                    <button onclick="printRecord()" class="btn-warning text-white py-3 px-8 rounded-lg font-bold shadow-lg button-press">
+                        <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        Print Record
+                    </button>
+                    <button onclick="exportRecord()" class="btn-primary text-white py-3 px-8 rounded-lg font-bold shadow-lg button-press">
+                        <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                        Export PDF
+                    </button>
+                    <button onclick="sendNotification()" class="bg-purple-500 hover:bg-purple-600 text-white py-3 px-8 rounded-lg font-bold shadow-lg transition-all button-press">
+                        <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                        </svg>
+                        Send Update
+                    </button>
+                    <button onclick="viewHistory()" class="bg-gray-500 hover:bg-gray-600 text-white py-3 px-8 rounded-lg font-bold shadow-lg transition-all button-press">
+                        <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                        </svg>
+                        View History
+                    </button>
+                    <button onclick="goBack()" class="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-8 rounded-lg font-bold shadow-lg transition-all button-press">
+                        <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="bg-gray-900 text-white py-8 footer-expanded transition-all duration-300">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="bg-blue-600 p-2 rounded-lg">
+                            <i class="fas fa-hospital text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">MOPH</h3>
+                            <p class="text-sm text-gray-400">Excellence in Healthcare</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-400">
+                        Providing quality healthcare services since 1985. 
+                        DOH Licensed and Accredited Medical Institution.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Information</h4>
+                    <div class="space-y-2 text-sm text-gray-400">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-map-marker-alt w-4"></i>
+                            <span>Balingasag Provincial Hospital, Balingasag Misamis Oriental</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-phone w-4"></i>
+                            <span>(088) 555-0123</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-envelope w-4"></i>
+                            <span>info@mophbalingasag.gov.ph</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-clock w-4"></i>
+                            <span>24/7 Emergency Services</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Patient Portal</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Emergency Services</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Laboratory Results</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Appointment Booking</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors focus-visible">Insurance Partners</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Certifications</h4>
+                    <div class="space-y-2 text-sm text-gray-400">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-certificate text-blue-400 w-4"></i>
+                            <span>DOH License: DOH-2025-HOSP-001</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-award text-green-400 w-4"></i>
+                            <span>PhilHealth Accredited</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-shield-alt text-yellow-400 w-4"></i>
+                            <span>ISO 9001:2015 Certified</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-dog text-purple-400 w-4"></i>
+                            <span>ABTC Accredited Center</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="text-sm text-gray-400">
+                        <p>&copy; 2025 MOPH. All rights reserved.</p>
+                        <p class="mt-1">Hospital Management System v2.4.1 | Last Updated: July 28, 2025</p>
+                    </div>
+                    <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                        <span class="text-sm text-gray-400">Follow us:</span>
+                        <div class="flex space-x-3">
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors focus-visible" aria-label="Facebook">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors focus-visible" aria-label="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors focus-visible" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors focus-visible" aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const footer = document.getElementById('footer');
+        
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-collapsed');
+            sidebar.classList.toggle('sidebar-expanded');
+            mainContent.classList.toggle('main-content-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            footer.classList.toggle('footer-collapsed');
+            footer.classList.toggle('footer-expanded');
+            
+            // Hide/show sidebar text with animation
+            const sidebarTexts = document.querySelectorAll('.sidebar-text');
+            sidebarTexts.forEach(text => {
+                if (sidebar.classList.contains('sidebar-collapsed')) {
+                    text.style.opacity = '0';
+                    setTimeout(() => {
+                        text.style.display = 'none';
+                    }, 150);
+                } else {
+                    text.style.display = 'inline';
+                    setTimeout(() => {
+                        text.style.opacity = '1';
+                    }, 150);
+                }
+            });
+        });
+
+        // Notification functionality
+        document.getElementById('notificationBtn').addEventListener('click', function() {
+            const notifications = [
+                { type: 'info', message: 'Patient record updated successfully', time: '2 hours ago' },
+                { type: 'warning', message: 'Vaccine stock running low', time: '4 hours ago' },
+                { type: 'success', message: 'Weekly report generated successfully', time: '6 hours ago' }
+            ];
+            
+            let notificationHtml = 'Recent Notifications:\n\n';
+            notifications.forEach(notif => {
+                notificationHtml += `• ${notif.message} (${notif.time})\n`;
+            });
+            
+            alert(notificationHtml);
+            
+            // Remove notification badge after viewing
+            const badge = this.querySelector('span');
+            badge.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }, 300);
+        });
+
+        // Show success message
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.getElementById('success-message');
+            const messageText = document.getElementById('success-text');
+            
+            messageText.textContent = message;
+            messageDiv.className = type === 'error' ? 
+                'bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg mb-4' :
+                'success-message';
+            
+            messageDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Edit record function
+        function editRecord() {
+            if (confirm('Are you sure you want to edit this record? This will open the form in edit mode.')) {
+                showMessage('Redirecting to edit mode...', 'success');
+                setTimeout(() => {
+                    console.log('Navigate to edit form with patient ID: PT-20250726-001');
+                }, 1000);
+            }
+        }
+
+        // Print record function
+        function printRecord() {
+            const actionSection = document.querySelector('.record-section:last-child');
+            const header = document.querySelector('header');
+            const sidebar = document.getElementById('sidebar');
+            const footer = document.getElementById('footer');
+            
+            actionSection.style.display = 'none';
+            header.style.display = 'none';
+            sidebar.style.display = 'none';
+            footer.style.display = 'none';
+            
+            window.print();
+            
+            setTimeout(() => {
+                actionSection.style.display = 'block';
+                header.style.display = 'block';
+                sidebar.style.display = 'block';
+                footer.style.display = 'block';
+            }, 1000);
+        }
+
+        // Export record to PDF
+        function exportRecord() {
+            showMessage('Generating PDF export...', 'success');
+            setTimeout(() => {
+                showMessage('PDF export completed! Check your downloads folder.', 'success');
+            }, 2000);
+        }
+
+        // Send notification/update
+        function sendNotification() {
+            const recipient = prompt('Send update to (email address):');
+            if (recipient) {
+                showMessage(`Treatment update sent to ${recipient}`, 'success');
+            }
+        }
+
+        // View patient history
+        function viewHistory() {
+            showMessage('Loading patient treatment history...', 'success');
+            setTimeout(() => {
+                alert('Patient History:\n\n• This is the first PEP treatment for this patient\n• No previous animal bite incidents on record\n• Vaccination series completed successfully\n• No adverse reactions documented');
+            }, 1000);
+        }
+
+        // Go back to dashboard
+        function goBack() {
+            if (confirm('Return to dashboard?')) {
+                showMessage('Returning to dashboard...', 'success');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date
+            const currentDate = document.getElementById('currentDate');
+            const today = new Date();
+            currentDate.textContent = today.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            console.log('PEP Record loaded: PT-20250726-001');
+            addHoverEffects();
+        });
+
+        // Add hover effects to record sections
+        function addHoverEffects() {
+            const sections = document.querySelectorAll('.record-section');
+            sections.forEach(section => {
+                section.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                
+                section.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                printRecord();
+            }
+            
+            if (e.key === 'Escape') {
+                goBack();
+            }
+            
+            if (e.key === 'e' || e.key === 'E') {
+                if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+                    editRecord();
+                }
+            }
+        });
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+            @media print {
+                header, aside, footer, .record-section:last-child {
+                    display: none !important;
+                }
+                .main-content-expanded, .main-content-collapsed {
+                    margin-left: 0 !important;
+                    padding-top: 0 !important;
+                }
+                .record-section {
+                    break-inside: avoid;
+                    margin-bottom: 1rem;
+                    box-shadow: none;
+                }
+                .patient-header {
+                    background: #3b82f6 !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
